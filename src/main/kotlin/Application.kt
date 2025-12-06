@@ -22,7 +22,7 @@ fun main() {
 }
 
 fun Application.module() {
-    // Configuración CORS unificada
+    // Configuración CORS
     install(CORS) {
         // Permitir solicitudes del API principal y otros hosts
         allowHost("localhost:9000", schemes = listOf("http"))
