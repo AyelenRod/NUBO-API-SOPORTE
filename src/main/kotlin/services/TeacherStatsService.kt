@@ -139,7 +139,7 @@ class TeacherStatsService {
                     StudentProgress(
                         studentId = studentId,
                         activityId = activityId,
-                        score = (50.0..100.0).random(),
+                        score = (50..100).random().toDouble(),
                         completedAt = java.util.Date(),
                         timeSpent = (60L..600L).random(),
                         attempts = (1..3).random()

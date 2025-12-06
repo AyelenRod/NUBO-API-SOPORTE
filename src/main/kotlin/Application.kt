@@ -22,8 +22,33 @@ fun main() {
 }
 
 fun Application.module() {
-    configureCORS()
-    configureSerialization()
+    // Configuración CORS unificada
+    install(CORS) {
+        // Permitir solicitudes del API principal y otros hosts
+        allowHost("localhost:9000", schemes = listOf("http"))
+        allowHost("54.226.246.30:9000", schemes = listOf("http"))
+        anyHost()
+
+        allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Post)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
+        allowMethod(HttpMethod.Options)
+
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Authorization)
+
+        allowCredentials = true
+        maxAgeInSeconds = 3600
+    }
+
+    // Configuración de serialización
+    install(ContentNegotiation) {
+        jackson {
+            enable(com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT)
+            enable(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        }
+    }
 
     // Inicializar servicios
     val activityAnalysisService = ActivityAnalysisService()
@@ -33,41 +58,23 @@ fun Application.module() {
     val teacherStatsService = TeacherStatsService()
 
     routing {
+        // Ruta raíz
         get("/") {
             call.respondText("NUBO Support API - Sistema de Análisis y Recomendaciones")
         }
 
+        // Health check
         get("/health") {
             call.respond(mapOf("status" to "OK", "service" to "Nubo Support API"))
         }
 
-        activityAnalysisRoutes(activityAnalysisService)
-        recommendationRoutes(recommendationService)
-        studentProgressRoutes(studentProgressService)
-        activityGraphRoutes(activityGraphService)
-        teacherStatsRoutes(teacherStatsService)
-    }
-}
-
-fun Application.configureCORS() {
-    install(CORS) {
-        anyHost()
-        allowMethod(HttpMethod.Get)
-        allowMethod(HttpMethod.Post)
-        allowMethod(HttpMethod.Put)
-        allowMethod(HttpMethod.Delete)
-        allowMethod(HttpMethod.Options)
-        allowHeader(HttpHeaders.ContentType)
-        allowHeader(HttpHeaders.Authorization)
-        allowCredentials = true
-        maxAgeInSeconds = 3600
-    }
-}
-
-fun Application.configureSerialization() {
-    install(ContentNegotiation) {
-        jackson {
-            enable(com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT)
+        // Todas las rutas bajo /api/support
+        route("/api/support") {
+            activityAnalysisRoutes(activityAnalysisService)
+            recommendationRoutes(recommendationService)
+            studentProgressRoutes(studentProgressService)
+            activityGraphRoutes(activityGraphService)
+            teacherStatsRoutes(teacherStatsService)
         }
     }
 }

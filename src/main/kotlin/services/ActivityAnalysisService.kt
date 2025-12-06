@@ -104,7 +104,7 @@ class ActivityAnalysisService {
             val progress = StudentProgress(
                 studentId = studentIds.random(),
                 activityId = activityIds.random(),
-                score = (30.0..100.0).random(),
+                score = (30..100).random().toDouble() ,
                 completedAt = Date(),
                 timeSpent = (60L..600L).random(),
                 attempts = (1..5).random()
