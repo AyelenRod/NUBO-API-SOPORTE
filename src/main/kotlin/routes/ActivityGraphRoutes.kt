@@ -1,137 +1,83 @@
-package com.soporte.routes
+package com.soporte
 
-import com.soporte.services.ActivityGraphService
-import io.ktor.http.*
+import com.soporte.routes.*
+import com.soporte.services.*
+import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
-import io.ktor.server.request.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.http.*
+import io.ktor.server.plugins.cors.routing.*
 
-fun Route.activityGraphRoutes(service: ActivityGraphService) {
-    route("/graph") {
+fun main() {
+    embeddedServer(
+        Netty,
+        port = System.getenv("SUPPORT_PORT")?.toInt() ?: 8080,
+        host = "0.0.0.0",
+        module = Application::supportModule
+    ).start(wait = true)
+}
 
-        // Agregar actividad al grafo
-        post("/activity") {
-            try {
-                val body = call.receive<Map<String, String>>()
-                val activityId = body["activityId"]
-                    ?: return@post call.respond(HttpStatusCode.BadRequest, mapOf("error" to "activityId requerido"))
+fun Application.supportModule() {
+    configureSupportCORS()
+    configureSupportSerialization()
 
-                service.addActivity(activityId)
-                call.respond(HttpStatusCode.Created, mapOf("message" to "Actividad agregada al grafo"))
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.BadRequest, mapOf("error" to e.message))
-            }
+    // Inicializar servicios
+    val activityAnalysisService = ActivityAnalysisService()
+    val recommendationService = RecommendationService()
+    val studentProgressService = StudentProgressService()
+    val activityGraphService = ActivityGraphService()
+    val teacherStatsService = TeacherStatsService()
+
+    routing {
+        get("/") {
+            call.respondText("NUBO Support API - Sistema de Análisis y Recomendaciones")
         }
 
-        // Agregar prerrequisito
-        post("/prerequisite") {
-            try {
-                val body = call.receive<Map<String, Any>>()
-                val prerequisite = body["prerequisite"] as? String
-                    ?: return@post call.respond(HttpStatusCode.BadRequest, mapOf("error" to "prerequisite requerido"))
-                val activity = body["activity"] as? String
-                    ?: return@post call.respond(HttpStatusCode.BadRequest, mapOf("error" to "activity requerido"))
-                val weight = (body["weight"] as? Number)?.toDouble() ?: 1.0
-
-                service.addPrerequisite(prerequisite, activity, weight)
-                call.respond(HttpStatusCode.Created, mapOf("message" to "Prerrequisito agregado"))
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.BadRequest, mapOf("error" to e.message))
-            }
+        get("/health") {
+            call.respond(mapOf("status" to "OK", "service" to "Nubo Support API"))
         }
 
-        // Verificar si puede acceder a actividad
-        post("/can-access") {
-            try {
-                val body = call.receive<Map<String, Any>>()
-                @Suppress("UNCHECKED_CAST")
-                val completedActivities = body["completedActivities"] as? List<String> ?: emptyList()
-                val targetActivity = body["targetActivity"] as? String
-                    ?: return@post call.respond(HttpStatusCode.BadRequest, mapOf("error" to "targetActivity requerido"))
-
-                val canAccess = service.canAccessActivity(completedActivities, targetActivity)
-                call.respond(HttpStatusCode.OK, mapOf("canAccess" to canAccess))
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.BadRequest, mapOf("error" to e.message))
-            }
+        // Rutas de soporte
+        route("/api/support") {
+            activityAnalysisRoutes(activityAnalysisService)
+            recommendationRoutes(recommendationService)
+            studentProgressRoutes(studentProgressService)
+            activityGraphRoutes(activityGraphService)
+            teacherStatsRoutes(teacherStatsService)
         }
+    }
+}
 
-        // Obtener ruta recomendada
-        post("/recommended-path") {
-            try {
-                val body = call.receive<Map<String, Any>>()
-                @Suppress("UNCHECKED_CAST")
-                val completedActivities = body["completedActivities"] as? List<String> ?: emptyList()
-                val targetActivity = body["targetActivity"] as? String
-                    ?: return@post call.respond(HttpStatusCode.BadRequest, mapOf("error" to "targetActivity requerido"))
+fun Application.configureSupportCORS() {
+    install(CORS) {
+        // Permitir solicitudes del API principal
+        allowHost("localhost:9000", schemes = listOf("http"))
+        allowHost("54.226.246.30:9000", schemes = listOf("http"))
+        anyHost()
 
-                val path = service.getRecommendedPath(completedActivities, targetActivity)
-                call.respond(HttpStatusCode.OK, path)
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.BadRequest, mapOf("error" to e.message))
-            }
-        }
+        allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Post)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
+        allowMethod(HttpMethod.Options)
 
-        // Obtener siguientes actividades sugeridas
-        post("/suggested-next") {
-            try {
-                val body = call.receive<Map<String, Any>>()
-                @Suppress("UNCHECKED_CAST")
-                val completedActivities = body["completedActivities"] as? List<String> ?: emptyList()
+        allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Authorization)
 
-                val suggested = service.getSuggestedNextActivities(completedActivities)
-                call.respond(HttpStatusCode.OK, mapOf("suggestedActivities" to suggested))
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.BadRequest, mapOf("error" to e.message))
-            }
-        }
+        allowCredentials = true
+        maxAgeInSeconds = 3600
+    }
+}
 
-        // Obtener ruta de aprendizaje completa
-        get("/learning-path") {
-            try {
-                val path = service.getLearningPath()
-                if (path != null) {
-                    call.respond(HttpStatusCode.OK, mapOf("learningPath" to path))
-                } else {
-                    call.respond(HttpStatusCode.Conflict, mapOf("error" to "El grafo contiene ciclos"))
-                }
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.InternalServerError, mapOf("error" to e.message))
-            }
-        }
-
-        // Obtener dependencias de una actividad
-        get("/dependencies/{activityId}") {
-            try {
-                val activityId = call.parameters["activityId"]
-                    ?: return@get call.respond(HttpStatusCode.BadRequest, mapOf("error" to "activityId requerido"))
-
-                val dependencies = service.getActivityDependencies(activityId)
-                call.respond(HttpStatusCode.OK, mapOf("dependencies" to dependencies))
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.InternalServerError, mapOf("error" to e.message))
-            }
-        }
-
-        // Generar grafo de prueba
-        post("/generate-sample") {
-            try {
-                service.generateSampleGraph()
-                call.respond(HttpStatusCode.OK, mapOf("message" to "Grafo de prueba generado"))
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.InternalServerError, mapOf("error" to e.message))
-            }
-        }
-
-        // Limpiar grafo
-        delete("/clear") {
-            try {
-                service.clearGraph()
-                call.respond(HttpStatusCode.OK, mapOf("message" to "Grafo limpiado"))
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.InternalServerError, mapOf("error" to e.message))
-            }
+fun Application.configureSupportSerialization() {
+    install(ContentNegotiation) {
+        jackson {
+            enable(com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT)
+            enable(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         }
     }
 }

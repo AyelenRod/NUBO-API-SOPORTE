@@ -12,7 +12,6 @@ import io.ktor.server.routing.*
 import io.ktor.http.*
 import io.ktor.server.plugins.cors.routing.*
 
-
 fun main() {
     embeddedServer(
         Netty,
