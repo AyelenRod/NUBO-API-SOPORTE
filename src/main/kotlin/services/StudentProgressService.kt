@@ -3,9 +3,6 @@ package com.soporte.services
 import com.soporte.datastructures.ActivityBST
 import com.soporte.models.ActivityNode
 
-/**
- * Servicio que utiliza ÁRBOL BST para organizar actividades por dificultad
- */
 class StudentProgressService {
     // ÁRBOL: Para organizar actividades por nivel de dificultad
     private val activityTree = ActivityBST()
@@ -50,7 +47,6 @@ class StudentProgressService {
         activityTree.clear()
     }
 
-    // Método para generar datos de prueba
     fun generateSampleActivities() {
         val sampleActivities = listOf(
             Triple("act1", 1, "Introducción a las sílabas"),

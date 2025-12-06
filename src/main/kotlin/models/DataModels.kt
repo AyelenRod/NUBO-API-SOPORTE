@@ -36,7 +36,7 @@ data class StudentProgress(
     val activityId: String,
     val score: Double,
     val completedAt: Date,
-    val timeSpent: Long, // en segundos
+    val timeSpent: Long,
     val attempts: Int
 )
 
@@ -71,8 +71,8 @@ data class ActivityNode(
 data class ActivityEdge(
     val from: String,
     val to: String,
-    val weight: Double, // Representa qué tan relacionadas están
-    val relation: String // "prerequisite", "similar", "next_level"
+    val weight: Double,
+    val relation: String
 )
 
 // Modelo para estadísticas del maestro

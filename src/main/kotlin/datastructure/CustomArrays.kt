@@ -1,9 +1,5 @@
 package com.soporte.datastructures
 
-/**
- * ARREGLO 1: Arreglo dinámico para almacenar progreso de estudiantes
- * Permite redimensionamiento automático cuando se llena
- */
 class DynamicProgressArray<T>(initialCapacity: Int = 10) {
     private var array: Array<Any?> = arrayOfNulls(initialCapacity)
     private var size = 0
@@ -40,10 +36,6 @@ class DynamicProgressArray<T>(initialCapacity: Int = 10) {
     }
 }
 
-/**
- * ARREGLO 2: Arreglo circular para mantener historial de intentos recientes
- * Útil para análisis de tendencias sin consumir demasiada memoria
- */
 class CircularArray<T>(private val capacity: Int) {
     private val array: Array<Any?> = arrayOfNulls(capacity)
     private var head = 0

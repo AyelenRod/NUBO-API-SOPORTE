@@ -1,9 +1,5 @@
 package com.soporte.datastructures
 
-/**
- * CONJUNTO: HashSet personalizado para mantener IDs únicos de estudiantes
- * que han completado ciertas actividades
- */
 class CustomHashSet<T> {
     private val buckets = Array<MutableList<T>?>(16) { null }
     private var size = 0

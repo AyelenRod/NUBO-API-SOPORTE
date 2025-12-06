@@ -1,9 +1,5 @@
 package com.soporte.datastructures
 
-/**
- * ÁRBOL: Árbol binario de búsqueda para organizar actividades por dificultad
- * Permite búsqueda eficiente de actividades según nivel de dificultad
- */
 class ActivityBST {
     data class ActivityTreeNode(
         val activityId: String,
@@ -33,7 +29,6 @@ class ActivityBST {
             difficulty < node.difficulty -> node.left = insertRec(node.left, activityId, difficulty, title)
             difficulty > node.difficulty -> node.right = insertRec(node.right, activityId, difficulty, title)
             else -> {
-                // Si tienen la misma dificultad, insertar a la derecha
                 node.right = insertRec(node.right, activityId, difficulty, title)
             }
         }

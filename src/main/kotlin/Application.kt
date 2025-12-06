@@ -22,9 +22,8 @@ fun main() {
 }
 
 fun Application.module() {
-    // Configuración CORS
+    // CORS
     install(CORS) {
-        // Permitir solicitudes del API principal y otros hosts
         allowHost("localhost:9000", schemes = listOf("http"))
         allowHost("54.226.246.30:9000", schemes = listOf("http"))
         anyHost()
@@ -68,7 +67,7 @@ fun Application.module() {
             call.respond(mapOf("status" to "OK", "service" to "Nubo Support API"))
         }
 
-        // Todas las rutas bajo /api/support
+        // Todas las rutas
         route("/api/support") {
             activityAnalysisRoutes(activityAnalysisService)
             recommendationRoutes(recommendationService)

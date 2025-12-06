@@ -3,9 +3,6 @@ package com.soporte.services
 import com.soporte.datastructures.*
 import com.soporte.models.*
 
-/**
- * Servicio que utiliza PILA y COLA para manejar recomendaciones
- */
 class RecommendationService {
     // PILA: Para mantener historial de navegación de actividades
     private val navigationHistory = mutableMapOf<String, CustomStack<String>>()
@@ -44,23 +41,20 @@ class RecommendationService {
 
         val recommended = when {
             studentScore >= 80.0 -> {
-                // Estudiante avanzado: recomendar actividades desafiantes
                 candidates.take(3)
             }
             studentScore >= 60.0 -> {
-                // Estudiante intermedio: mezcla de actividades
                 candidates.take(4)
             }
             else -> {
-                // Estudiante que necesita refuerzo: actividades básicas
                 candidates.take(5)
             }
         }
 
         val priority = when {
-            studentScore < 50.0 -> 1 // Alta prioridad
-            studentScore < 70.0 -> 2 // Media prioridad
-            else -> 3 // Baja prioridad
+            studentScore < 50.0 -> 1
+            studentScore < 70.0 -> 2
+            else -> 3
         }
 
         val reasoning = when {

@@ -1,9 +1,5 @@
 package com.soporte.datastructures
 
-/**
- * GRAFO DIRIGIDO: Para representar dependencias y relaciones entre actividades
- * Útil para determinar rutas de aprendizaje y prerrequisitos
- */
 class DirectedGraph<T> {
     private val adjacencyList = mutableMapOf<T, MutableList<Edge<T>>>()
 

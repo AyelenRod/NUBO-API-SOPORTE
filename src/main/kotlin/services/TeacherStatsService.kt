@@ -3,17 +3,11 @@ package com.soporte.services
 import com.soporte.datastructures.CustomHashSet
 import com.soporte.models.*
 
-/**
- * Servicio que utiliza CONJUNTO para estadísticas de maestros
- */
 class TeacherStatsService {
-    // CONJUNTO: Para mantener estudiantes únicos por maestro
     private val teacherStudents = mutableMapOf<String, CustomHashSet<String>>()
 
-    // Conjunto de actividades por maestro
     private val teacherActivities = mutableMapOf<String, CustomHashSet<String>>()
 
-    // Datos de progreso para estadísticas
     private val allProgress = mutableListOf<StudentProgress>()
 
     fun addStudentToTeacher(teacherId: String, studentId: String) {
@@ -109,9 +103,7 @@ class TeacherStatsService {
         allProgress.clear()
     }
 
-    // Método para generar datos de prueba
     fun generateSampleData() {
-        // Agregar estudiantes a maestros
         val teacher1 = "teacher1"
         val teacher2 = "teacher2"
 

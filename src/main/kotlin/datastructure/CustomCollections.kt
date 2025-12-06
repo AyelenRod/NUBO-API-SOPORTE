@@ -2,9 +2,6 @@ package com.soporte.datastructures
 
 import java.util.*
 
-/**
- * LISTA: Lista enlazada personalizada para mantener orden de recomendaciones
- */
 class CustomLinkedList<T> {
     private data class Node<T>(
         var data: T,
@@ -75,9 +72,7 @@ class CustomLinkedList<T> {
     }
 }
 
-/**
- * PILA: Stack para mantener historial de navegación de actividades
- */
+
 class CustomStack<T> {
     private val items = mutableListOf<T>()
 
@@ -106,9 +101,6 @@ class CustomStack<T> {
     }
 }
 
-/**
- * COLA: Queue para procesar recomendaciones en orden
- */
 class CustomQueue<T> {
     private val items = LinkedList<T>()
 

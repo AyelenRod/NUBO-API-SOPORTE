@@ -2,9 +2,6 @@ package com.soporte.services
 
 import com.soporte.datastructures.DirectedGraph
 
-/**
- * Servicio que utiliza GRAFO DIRIGIDO para representar dependencias entre actividades
- */
 class ActivityGraphService {
     // GRAFO DIRIGIDO: Para representar rutas de aprendizaje y prerrequisitos
     private val activityGraph = DirectedGraph<String>()
@@ -26,7 +23,6 @@ class ActivityGraphService {
     }
 
     fun canAccessActivity(studentCompletedActivities: List<String>, targetActivity: String): Boolean {
-        // Verificar si el estudiante ha completado alguna actividad que lleve a la actividad objetivo
         return studentCompletedActivities.any { completed ->
             activityGraph.hasPath(completed, targetActivity)
         } || studentCompletedActivities.contains(targetActivity)
@@ -97,9 +93,7 @@ class ActivityGraphService {
         activityGraph.clear()
     }
 
-    // Método para generar grafo de prueba
     fun generateSampleGraph() {
-        // Agregar actividades
         val activities = listOf("act1", "act2", "act3", "act4", "act5", "act6", "act7", "act8")
         activities.forEach { addActivity(it) }
 

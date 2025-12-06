@@ -4,9 +4,6 @@ import com.soporte.datastructures.*
 import com.soporte.models.*
 import java.util.*
 
-/**
- * Servicio que utiliza ARREGLOS y LISTA para análisis de actividades
- */
 class ActivityAnalysisService {
     // ARREGLO DINÁMICO: Para almacenar progresos
     private val progressArray = DynamicProgressArray<StudentProgress>()
@@ -95,7 +92,6 @@ class ActivityAnalysisService {
         analysisCache.clear()
     }
 
-    // Método para generar datos de prueba
     fun generateSampleData() {
         val activityIds = listOf("act1", "act2", "act3", "act4", "act5")
         val studentIds = listOf("st1", "st2", "st3", "st4", "st5", "st6", "st7", "st8")
